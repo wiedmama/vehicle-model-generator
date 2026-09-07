@@ -18,9 +18,9 @@
 import os
 import shutil
 import sys
-from typing import List
+from typing import List, Sequence
 
-import vspec  # type: ignore
+import vss_tools  # type: ignore
 
 from velocitas.model_generator.cpp.cpp_generator import VehicleModelCppGenerator
 from velocitas.model_generator.python.python_generator import (
@@ -39,9 +39,9 @@ def generate_model(
     target_folder: str = "./gen_model",
     name: str = "vehicle",
     strict: bool = True,
-    include_dir: str = ".",
-    ext_attributes_list: List[str] = [],
-    overlays: List[str] = [],
+    include_dir: str | Sequence[str] = ".",
+    ext_attributes_list: List[str] | None = None,
+    overlays: List[str] | None = None,
 ) -> None:
     """Generates a model to a file (json, vspec)
     input_file_path str: The file to convert.
@@ -56,15 +56,12 @@ def generate_model(
     """
 
     include_dirs = ["."]
-    include_dirs.extend(include_dir)
-
-    # yaml_out = open(args.yaml_file, "w", encoding="utf-8")
-
-    if len(ext_attributes_list) > 0:
-        vspec.model.vsstree.VSSNode.whitelisted_extended_attributes = (
-            ext_attributes_list
-        )
-        print(f"Known extended attributes: {', '.join(ext_attributes_list)}")
+    ext_attributes = ext_attributes_list or []
+    overlay_paths = overlays or []
+    if isinstance(include_dir, str):
+        include_dirs.append(include_dir)
+    else:
+        include_dirs.extend(include_dir)
 
     try:
         if os.path.exists(target_folder):
@@ -75,7 +72,8 @@ def generate_model(
             input_unit_file_path_list,
             include_dirs,
             strict,
-            overlays,
+            overlay_paths,
+            ext_attributes,
         ).load_tree()
 
         if language == "python":
@@ -96,7 +94,7 @@ def generate_model(
             print("All done.")
         else:
             print(f"Language {language} is not supported yet.")
-    except vspec.VSpecError as e:
+    except vss_tools.vspec.InvalidSpecException as e:
         print(f"Error: {e}")
         sys.exit(255)
     except UnsupportedFileFormat as e:

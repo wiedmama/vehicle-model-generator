@@ -23,6 +23,17 @@ from velocitas.model_generator import generate_model
 test_data_base_path = Path(__file__).parent.joinpath("data")
 
 
+def get_unit_file_paths(input_file_path: str, include_dir: str) -> list[str]:
+    include_path = test_data_base_path.joinpath(include_dir)
+    if (
+        input_file_path.endswith(".vspec")
+        and include_path.joinpath("units.yaml").is_file()
+    ):
+        return [include_path.joinpath("units.yaml").__str__()]
+
+    return [test_data_base_path.joinpath("units.yaml").__str__()]
+
+
 @pytest.mark.parametrize("language", ["python", "cpp"])
 @pytest.mark.parametrize(
     "input_file_path,include_dir",
@@ -36,13 +47,13 @@ test_data_base_path = Path(__file__).parent.joinpath("data")
         # ("vspec/v3.1/spec/VehicleSignalSpecification.vspec", "vspec/v3.1/spec"),
         # ("vspec/v3.1.1/spec/VehicleSignalSpecification.vspec", "vspec/v3.1.1/spec"),
         ("vspec/v4.0/spec/VehicleSignalSpecification.vspec", "vspec/v4.0/spec"),
+        ("vspec/v5.0/spec/VehicleSignalSpecification.vspec", "vspec/v5.0/spec"),
+        ("vspec/v6.0/spec/VehicleSignalSpecification.vspec", "vspec/v6.0/spec"),
     ],
 )
 def test_generate(language: str, input_file_path: str, include_dir: str):
     input_file_path = Path(__file__).parent.joinpath("data", input_file_path).__str__()
-    input_unit_file_path_list = [
-        (Path(__file__).parent.joinpath("data", "units.yaml").__str__()),
-    ]
+    input_unit_file_path_list = get_unit_file_paths(input_file_path, include_dir)
     print(input_unit_file_path_list)
     generate_model(
         input_file_path,

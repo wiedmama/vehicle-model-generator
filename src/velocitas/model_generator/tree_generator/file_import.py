@@ -38,11 +38,13 @@ class FileImport:
         include_dirs: List[str],
         strict: bool,
         overlays: List[str],
+        extended_attributes: List[str],
     ):
         self.file_path = file_path
         self.include_dirs = include_dirs
         self.strict = strict
         self.overlays = overlays
+        self.extended_attributes = extended_attributes
         # setting the file format implementation object from the file_path
         self.format_implementation = self.__get_format_implementation(
             self.file_path, unit_file_path_list
@@ -76,6 +78,7 @@ class FileImport:
                     include_dirs=self.include_dirs,
                     strict=self.strict,
                     overlays=self.overlays,
+                    extended_attributes=self.extended_attributes,
                 )
             elif file_ext == JSON:
                 return Json(

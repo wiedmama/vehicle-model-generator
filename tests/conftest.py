@@ -54,3 +54,5 @@ def pytest_configure(config) -> None:
     prepare_vss_repo_data("v3.1")
     prepare_vss_repo_data("v3.1.1")
     prepare_vss_repo_data("v4.0")
+    prepare_vss_repo_data("v5.0")
+    prepare_vss_repo_data("v6.0")
