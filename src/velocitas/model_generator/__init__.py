@@ -18,7 +18,7 @@
 import os
 import shutil
 import sys
-from typing import List, Sequence
+from typing import List
 
 import vss_tools  # type: ignore
 
@@ -35,13 +35,14 @@ from velocitas.model_generator.tree_generator.file_import import (
 def generate_model(
     input_file_path: str,
     input_unit_file_path_list: List[str],
+    input_quantity_file_path_list: List[str],
     language: str,
     target_folder: str = "./gen_model",
     name: str = "vehicle",
     strict: bool = True,
-    include_dir: str | Sequence[str] = ".",
-    ext_attributes_list: List[str] | None = None,
-    overlays: List[str] | None = None,
+    include_dir: List[str] = [],
+    ext_attributes_list: List[str] = [],
+    overlays: List[str] = [],
 ) -> None:
     """Generates a model to a file (json, vspec)
     input_file_path str: The file to convert.
@@ -49,19 +50,13 @@ def generate_model(
     language str: The programming language used (python/cpp).
     target_folder str: The folder where the model should be generated to.
     name str: The name of the model
-    strict bool: If enabled checks for VSS terminoligy.
+    strict bool: If enabled checks for VSS terminology.
     include_dir: which directories to include for file searches
     ext_attributes_list List[str]: The extended attributes that aren't considered by the generator (no warnings)
     overlays List[str]: The overlay that is used to generate the model.
     """
 
-    include_dirs = ["."]
-    ext_attributes = ext_attributes_list or []
-    overlay_paths = overlays or []
-    if isinstance(include_dir, str):
-        include_dirs.append(include_dir)
-    else:
-        include_dirs.extend(include_dir)
+    # yaml_out = open(args.yaml_file, "w", encoding="utf-8")
 
     try:
         if os.path.exists(target_folder):
@@ -69,11 +64,12 @@ def generate_model(
 
         tree = FileImport(
             input_file_path,
+            include_dir,
             input_unit_file_path_list,
-            include_dirs,
+            input_quantity_file_path_list,
             strict,
-            overlay_paths,
-            ext_attributes,
+            overlays,
+            ext_attributes_list,
         ).load_tree()
 
         if language == "python":

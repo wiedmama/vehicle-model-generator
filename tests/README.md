@@ -7,7 +7,6 @@ Execute the following commands in the base directory of the repository:
    source ./venv/bin/activate
    ```
 
-
 2. Install the necessary dependencies in your python virtual environment
    ```bash
    pip3 install -r tests/requirements.txt

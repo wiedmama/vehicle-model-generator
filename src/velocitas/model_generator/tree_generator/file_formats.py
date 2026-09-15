@@ -17,6 +17,7 @@ import tempfile
 from abc import abstractmethod
 from typing import Any, List, TypedDict, cast
 from pathlib import Path
+from sys import exit
 
 from vss_tools.main import get_trees
 from vss_tools.tree import VSSNode  # type: ignore
@@ -39,16 +40,14 @@ UnitEntry = TypedDict(
 )
 
 
-def _load_reference_units() -> dict[str, Any]:
-    return {}
-
-
 def _normalize_legacy_unit_content(content: dict[str, Any]) -> dict[str, UnitEntry]:
+    # Unit file syntax changed in VSS 4.1. For details, see
+    # https://github.com/COVESA/vehicle_signal_specification/blob/release/4.2/CHANGELOG.md#vss-41
     units = content.get("units")
     if not isinstance(units, dict):
         return cast(dict[str, UnitEntry], content)
 
-    reference_units = _load_reference_units()
+    reference_units: dict[str, UnitEntry] = {}
     normalized_units: dict[str, UnitEntry] = {}
     for unit_name, unit_data in units.items():
         reference_unit = reference_units.get(unit_name)
@@ -82,6 +81,8 @@ def _normalize_legacy_unit_content(content: dict[str, Any]) -> dict[str, UnitEnt
 def _extract_legacy_quantities(
     normalized_units: dict[str, UnitEntry],
 ) -> dict[str, Any]:
+    # Generate quantities.yaml content from legacy unit file content.
+    # This is needed for VSS 4.1 and 4.2, which do not have a quantities.yaml file.
     if not isinstance(normalized_units, dict):
         return {}
 
@@ -98,7 +99,7 @@ def _extract_legacy_quantities(
 
 
 class FileFormat:
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: Path):
         self.file_path = file_path
 
     # method to override when adding a new format
@@ -110,15 +111,17 @@ class FileFormat:
 class Vspec(FileFormat):
     def __init__(
         self,
-        file_path: str,
-        unit_file_path_list: List[str],
-        include_dirs: List,
+        file_path: Path,
+        unit_file_path_list: List[Path],
+        quantity_file_path_list: List[Path],
+        include_dirs: List[Path],
         strict: bool,
-        overlays: List[str],
+        overlays: List[Path],
         extended_attributes: List[str],
     ):
         super().__init__(file_path)
         self.unit_file_path_list = unit_file_path_list
+        self.quantity_file_path_list = quantity_file_path_list
         self.include_dirs = include_dirs
         self.strict = strict
         self.overlays = overlays
@@ -127,27 +130,13 @@ class Vspec(FileFormat):
     def load_tree(self):
         """loads a tree of a vspec file through vss-tools"""
         print("Loading vspec...")
-        # convert strings to Path objects
-
-        # wda2fe todo: check wether paths exists
-        vspec_path = Path(self.file_path)
-        include_dirs = [Path(p) for p in self.include_dirs]
-        overlays = [Path(p) for p in self.overlays]
-        quantities_path_list = [Path(p + "/quantities.yaml") for p in self.include_dirs]
-
-        checked_quantities_list = []
-        for p in quantities_path_list:
-            if not p.is_file():
-                print(f"Warning: Quantity file {p} does not exist.")
-            else:
-                print(f"Loading quantity file: {p}")
-                checked_quantities_list.append(p)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             unit_file_path_list = []
             generated_quantities_path = None
-            for original_path in self.unit_file_path_list:
-                source_path = Path(original_path)
+
+            # check for units.yaml in old format and units.yaml and quantities.yaml in new format if needed
+            for source_path in self.unit_file_path_list:
                 content = yaml.safe_load(source_path.read_text())
                 if isinstance(content, dict) and "units" in content:
                     normalized_content = _normalize_legacy_unit_content(content)
@@ -159,25 +148,22 @@ class Vspec(FileFormat):
                     unit_file_path_list.append(normalized_path)
 
                     legacy_quantities = _extract_legacy_quantities(normalized_content)
-                    if legacy_quantities and not checked_quantities_list:
+                    if legacy_quantities and not self.quantity_file_path_list:
                         generated_quantities_path = Path(temp_dir) / "quantities.yaml"
                         generated_quantities_path.write_text(
                             yaml.safe_dump(legacy_quantities),
                             encoding="utf-8",
                         )
+                        self.quantity_file_path_list.append(generated_quantities_path)
                 else:
                     unit_file_path_list.append(source_path)
 
-            quantities_to_use = checked_quantities_list.copy()
-            if generated_quantities_path is not None:
-                quantities_to_use.append(generated_quantities_path)
-
             (tree, tree_types) = get_trees(
-                vspec_path,
-                include_dirs,
-                quantities=quantities_to_use,
-                units=unit_file_path_list,
-                overlays=overlays,
+                self.file_path,
+                self.include_dirs,
+                quantities=self.quantity_file_path_list,
+                units=self.unit_file_path_list,
+                overlays=self.overlays,
                 strict=self.strict,
                 extended_attributes=self.extended_attributes,
                 expand=False,
@@ -187,7 +173,7 @@ class Vspec(FileFormat):
 
 
 class Json(FileFormat):
-    def __init__(self, file_path: str, unit_file_path_list: List[str]):
+    def __init__(self, file_path: Path, unit_file_path_list: List[Path]):
         super().__init__(file_path)
         self.unit_file_path_list = unit_file_path_list
 

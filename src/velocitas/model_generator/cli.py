@@ -85,6 +85,14 @@ def main():
         help="The file locations of units files as comma separated list.",
     )
     parser.add_argument(
+        "-q",
+        "--quantities",
+        nargs="+",
+        type=str,
+        default=[],
+        help="The file locations of quantities files as comma separated list.",
+    )
+    parser.add_argument(
         "-e",
         "--extended-attributes",
         type=str,
@@ -106,6 +114,7 @@ def main():
     generate_model(
         args.input_file_path,
         args.units,
+        args.quantities,
         args.language,
         args.target_folder,
         args.package_name,
