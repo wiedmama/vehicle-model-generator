@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Contributors to the Eclipse Foundation
+# Copyright (c) 2022-2026 Contributors to the Eclipse Foundation
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -12,9 +12,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-pip3 install -r ./requirements-dev.txt
-pip3 install -r ./requirements.txt
-pip3 install -e .
+python3 -m venv venv
+venv/bin/python -m pip install -r ./requirements-dev.txt
+venv/bin/python -m pip install -r ./requirements.txt
+venv/bin/python -m pip install -r ./tests/requirements.txt
+venv/bin/python -m pip install -e .
 
 # add repo to git safe.directory
 REPO=$(pwd)
