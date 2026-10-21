@@ -1,0 +1,327 @@
+Vehicle:
+  type: branch
+  description: vehicle branch
+
+Vehicle.Implement:
+  type: branch
+  description: ISOBUS implements
+  instances:
+    - Implement[1,3]
+  instances_relation: sibling
+
+Vehicle.Implement.Count:
+  type: attribute
+  datatype: uint8
+  description: Number of active implements
+  instantiate: false
+
+Vehicle.Impement.Connector:
+  type: branch
+  description: Connector of ISOBUS implement
+
+Vehicle.Implement.Connector.InstantiatedValue:
+  type: sensor
+  description: Some sensor value on a connector
+  datatype: float
+
+Vehicle.Implement.Connector.NotInstantiatedValue:
+  type: sensor
+  description: Some sensor value on a connector
+  datatype: float
+  instantiate: false
+
+Vehicle.Implement.Boom:
+  type: branch
+  description: Booms of ISOBUS implements
+  instances:
+    - Boom[1,2]
+  instances_relation: sibling
+
+Vehicle.Implement.Boom.Count:
+  type: attribute
+  datatype: uint8
+  description: Number of active booms
+  instantiate: false
+
+Vehicle.Implement.Boom.Section:
+  type: branch
+  description: Sections on an ISOBUS boom
+  instances:
+    - Section[1,32]
+  instances_relation: sibling
+
+Vehicle.Implement.Boom.Section.Count:
+  type: attribute
+  datatype: uint8
+  description: Number of active sections
+  instantiate: false
+
+Vehicle.Implement.Boom.Channel:
+  type: branch
+  description: Channels on an ISOBUS boom
+  instances:
+    - Channel[1,32]
+  instances_relation: sibling
+
+Vehicle.Implement.Boom.Channel.Count:
+  type: attribute
+  datatype: uint8
+  description: Number of active channels
+  instantiate: false
+
+Vehicle.Implement.Boom.Channel.Subchannel:
+  type: branch
+  description: Subchannels of an ISOBUS channel
+  instances:
+    - Channel[1,8]
+  instances_relation: sibling
+
+Vehicle.Implement.Boom.Channel.Subchannel.Count:
+  type: attribute
+  datatype: uint8
+  description: Number of active subchannels
+  instantiate: false
+
+Vehicle.Speed:
+  datatype: float
+  type: sensor
+  unit: km/h
+  min: 0.0
+  description: Vehicle speed.
+  comment: Vehicle speed is the magnitude of the velocity vector. It is a scalar quantity and is always non-negative. The unit of measurement is kilometers per hour (km/h).
+
+Vehicle.Type:
+  datatype: uint8
+  type: attribute
+  description: Type of vehicle
+  min: 0
+  max: 10
+  comment: Vehicle type 
+
+# adc
+#Vehicle.ADC:
+#  type: branch
+#  description: ADC
+#
+#Vehicle.ADC.Value1:
+#  type: sensor
+#  datatype: double
+#  description: ADC1 value
+#
+#Vehicle.ADC.Value2:
+#  type: sensor
+#  datatype: double
+#  description: ADC2 value
+#
+#Vehicle.ADC.Value3:
+#  type: sensor
+#  datatype: double
+#  description: ADC3 value
+#
+#Vehicle.ADC.Value4:
+#  type: sensor
+#  datatype: double
+#  description: ADC4 value
+#
+## LED stripe interface 1
+#Vehicle.LED1:
+#  type: branch
+#  description: LED stripe interface 1 (bitfield)
+#
+#Vehicle.LED1.Channel:
+#  type: actuator
+#  datatype: uint32
+#  description: LED1 Channel bit field
+#
+#Vehicle.LED1.Red:
+#  type: actuator
+#  datatype: uint8
+#  description: Red value 0..255
+#
+#Vehicle.LED1.Green:
+#  type: actuator
+#  datatype: uint8
+#  description: Green value 0..255
+#
+#Vehicle.LED1.Blue:
+#  type: actuator
+#  datatype: uint8
+#  description: Blue value 0..255
+#
+#Vehicle.LED1.White:
+#  type: actuator
+#  datatype: uint8
+#  description: White value 0..255
+#
+# current location
+Vehicle.CurrentLocation:
+  type: branch
+  description: Current Vehicle location
+
+Vehicle.CurrentLocation.Latitude:
+  type: sensor
+  datatype: float
+  unit: degrees
+  description: Current longitude of vehicle in WGS 84 geodetic coordinates, as measured at the position of GNSS receiver antenna.
+
+Vehicle.CurrentLocation.Longitude:
+  type: sensor
+  datatype: float
+  unit: degrees
+  description: Current heading relative to geographic north. 0 = North, 90 = East, 180 = South, 270 = West.
+
+# Powertrain
+Vehicle.Powertrain:
+  type: branch
+  description: Powertrain data for battery management, etc.
+
+Vehicle.Powertrain.Type:
+  datatype: string
+  type: attribute
+  allowed: ['COMBUSTION', 'HYBRID', 'ELECTRIC']
+  description: Defines the powertrain type of the vehicle.
+  comment: For vehicles with a combustion engine (including hybrids) more detailed information on fuels supported can
+           be found in FuelSystem.SupportedFuelTypes and FuelSystem.SupportedFuels.
+
+# Combustion Engine
+Vehicle.Powertrain.CombustionEngine:
+  type: branch
+  description: Engine-specific data, stopping at the bell housing.
+
+Vehicle.Powertrain.CombustionEngine.Speed:
+  datatype: uint16
+  type: sensor
+  unit: rpm
+  description: Engine speed measured as rotations per minute.
+
+
+# implement
+
+#Vehicle.Implement.Manufacturer:
+#  type: attribute
+#  datatype: string
+#  description: ISOBUS implement manufacturer
+#
+#Vehicle.Implement.TotalArea:
+#  type: sensor
+#  datatype: uint32
+#  unit: m^2
+#  description: ISOBUS DDI116 Accumulated Area
+#
+## connector
+#Vehicle.Implement.Connector:
+#  type: branch
+#  description: Connector of ISOBUS implements
+#
+#Vehicle.Implement.Connector.Offset:
+#  type: branch
+#  description: Offset of a DeviceElement relative to a Device
+#
+#Vehicle.Implement.Connector.Offset.X:
+#  type: attribute
+#  datatype: int32
+#  unit: mm
+#  description: ISOBUS DDI134 Device Element Offset X.
+#               X direction offset of a DeviceElement relative to a Device.
+#  comment: The DDI 134, Device element offset X is used to represent the
+#           position offset for any DET element with respect to DRP. Further
+#           details and geometry inheritance can be referenced in ISO11783 part
+#           10.
+#
+#Vehicle.Implement.Connector.Offset.Y:
+#  type: attribute
+#  datatype: int32
+#  unit: mm
+#  description: ISOBUS DDI135 Device Element Offset Y.
+#               X direction offset of a DeviceElement relative to a Device.
+#  comment: The DDI 135, Device element offset Y is used to represent the
+#           position offset for any DET element with respect to DRP. Further
+#           details and geometry inheritance can be referenced in ISO11783 part
+#           10.
+#
+##Vehicle.Implement.Connector.Offset.Z:
+ # type: attribute
+ # datatype: int32
+ # unit: mm
+ # description: ISOBUS DDI136 Device Element Offset Z.
+ #              Z direction offset of a DeviceElement relative to a Device.
+ # comment: The DDI 135, Device element offset Z is used to represent the
+ #          position offset for any DET element with respect to DRP. Further
+ #          details and geometry inheritance can be referenced in ISO11783 part
+ #          10.
+#
+## boom
+#
+## Last Bale
+#Vehicle.Implement.Boom.LastBale:
+#  type: branch
+#  description: Last bale on boom level
+#
+#Vehicle.Implement.Boom.LastBale.Mass:
+#  type: sensor 
+#  datatype: int32
+#  unit: g
+#  description: Last bale mass on boom level
+#
+## section
+#Vehicle.Implement.Boom.Section:
+#  type: branch
+#  description: Sections of a ISOBUS Boom
+#
+#Vehicle.Implement.Boom.Section.Geometry:
+#  type: branch
+#  description: The section geometry
+#
+#Vehicle.Implement.Boom.Section.Geometry.X:
+#  type: sensor
+#  datatype: float
+#  uint: mm
+#  description: Section X-geometry
+#
+#Vehicle.Implement.Boom.Section.Geometry.Y:
+#  type: sensor
+#  datatype: float
+#  uint: mm
+#  description: Section Y-geometry
+#
+#Vehicle.Implement.Boom.Section.Geometry.Z:
+#  type: sensor
+#  datatype: float
+#  uint: mm
+#  description: Section Z-geometry
+#
+#Vehicle.Implement.Boom.Section.ApplicationRate:
+#  type: sensor
+#  datatype: float
+#  description: Setpoint application rate on section level
+#
+## channel
+#Vehicle.Implement.Boom.Channel.ApplicationRate:
+#  type: branch
+#  description: Application rates on channel level
+#
+## Application Rate
+#Vehicle.Implement.Boom.Channel.ApplicationRate.VolumePerArea:
+#  type: branch
+#  description: Application rate on channel level as volume per area
+#
+#Vehicle.Implement.Boom.Channel.ApplicationRate.VolumePerArea.Actual:
+#  type: sensor
+#  datatype: int32
+#  description: Actual application rate on channel level as volume per area
+#
+## subchannel
+#Vehicle.Implement.Boom.Channel.Subchannel.ApplicationRate:
+#  type: branch
+#  description: Application rates on subchannel level
+#
+## Application Rate
+#Vehicle.Implement.Boom.Channel.Subchannel.ApplicationRate.VolumePerArea:
+#  type: branch
+#  description: Application rate on subchannel level as volume per area
+#
+#Vehicle.Implement.Boom.Channel.Subchannel.ApplicationRate.VolumePerArea.MonitoredSetpoint:
+#  type: sensor
+#  datatype: int32
+#  description: Monitored setpoint of application rate on subchannel level as volume per area
+#

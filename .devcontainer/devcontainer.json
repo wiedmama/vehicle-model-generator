@@ -3,6 +3,9 @@
 {
     "name": "Vehicle Model Generator",
     "dockerFile": "Dockerfile",
+        "runArgs": [
+            "--network=host"
+        ],
     "customizations": {
         "vscode": {
             "settings": {

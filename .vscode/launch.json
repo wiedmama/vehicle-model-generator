@@ -8,6 +8,101 @@
         {
             "type": "debugpy",
             "request": "launch",
+            "name": "Generate Model M2 (C++) from vspec",
+            "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "--target-folder", "${workspaceFolder}/_gen/m2/cpp/",
+                "--package-name", "vehicle",
+                "--language", "cpp",
+                "--units", "${workspaceFolder}/tests/model/m2/units.yaml",
+                "--include-dir", "${workspaceFolder}/tests/model/m2",
+                "--extended-attributes", "elements,syscond",
+                "${workspaceFolder}/tests/model/m2/model.vspec"
+            ]
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Generate Model M1 (C++) from json",
+            "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "--target-folder", "${workspaceFolder}/_gen/m1/cpp/",
+                "--package-name", "vehicle",
+                "--language", "cpp",
+                "--units", "${workspaceFolder}/tests/model/m1/units.yaml",
+                "--include-dir", "${workspaceFolder}/tests/model/m1",
+                "--extended-attributes", "elements,syscond",
+                "${workspaceFolder}/tests/model/m1/model.json"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/"
+                   }
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Generate Model M1 (C++)",
+            "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "--target-folder", "${workspaceFolder}/_gen/m1/cpp/",
+                "--package-name", "vehicle",
+                "--language", "cpp",
+                "--units", "${workspaceFolder}/tests/model/m1/units.yaml",
+                "--include-dir", "${workspaceFolder}/tests/model/m1",
+                "--extended-attributes", "elements,syscond",
+                "${workspaceFolder}/tests/model/m1/model.vspec"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/"
+                   }
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Generate Model M1 (Python)",
+            "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "--target-folder", "${workspaceFolder}/_gen/m1/python",
+                "--package-name", "vehicle",
+                "--language", "python",
+                "--units", "${workspaceFolder}/tests/model/m1/units.yaml",
+                "--include-dir", "${workspaceFolder}/tests/model/m1",
+                "--extended-attributes", "elements,syscond",
+                "${workspaceFolder}/tests/model/m1/model.vspec"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/"
+                   }
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Generate standard catalogue",
+            "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "-T", "${workspaceFolder}/_gen/covesa/",
+                "-N", "covesa::vehicle",
+                "-l", "cpp",
+                "-I", "/home/wda2fe/repo/vehicle_signal_specification/spec",
+                "/home/wda2fe/repo/vehicle_signal_specification/spec/VehicleSignalSpecification.vspec"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/"
+                   }
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
             "name": "gen-vehicle-model",
             "program": "${workspaceFolder}/src/velocitas/model_generator/cli.py",
             "console": "internalConsole",

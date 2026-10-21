@@ -398,7 +398,10 @@ class VehicleModelConan(ConanFile):
                         )
                     )
 
-        return "\n\n".join(collection_types)
+        ret_classes = "\n\n".join(collection_types)
+        ret_classes = "\n\n#ifndef NODE_ARRAYS // begin: implement instances as collections\n" + ret_classes + "\n#endif // end: implement instances as collections\n"
+        return ret_classes
+        #return "\n//BEGIN NESTED CLASSES\n\n" + ret_classes + "\n//END NESTED CLASSES\n"
 
     def __gen_model(self, node: VSSNode, namespace_list: List[str], is_root=False):
         # must be done before generating the imports, since it is adding imports
@@ -432,10 +435,24 @@ class VehicleModelConan(ConanFile):
 
             header_public.write("%MEMBER%\n")
             header_public.dedent()
-            header_public.write("{}\n\n")
+            header_public.write("{\n")
+            """
+            wda2fe todo: add code for arrays of branches
+            commented out children_ member generation for now
+            """
+            header_public.indent()
+            header_public.write("children_ = {\n")
+            header_public.indent()
+            header_public.write("%CHILDREN%")
+            header_public.dedent()
+            header_public.write("\n}\n")
+            header_public.dedent()
+            header_public.write("}\n\n")
+            
 
             # create members
             member = ""
+            children_ = ""
             for child in node.children:
                 child_type = self.__get_node_type(child)
                 self.__document_member(child)
@@ -454,10 +471,22 @@ class VehicleModelConan(ConanFile):
                         + f'{child.name}("{child.name}", Type::{child_type.value.upper()}, this)'
                     )
 
+                    children_ += (
+                        "{" + f'"{child.name}", &{child.name}' + "},\n            "
+                    )
+
                 if child_type == NodeType.BRANCH:
+                    child_namespace_list = namespace_list + [child.name]
+                    child_namespace = self.__get_namespace(child_namespace_list)
                     if self.__get_instances(child):
-                        header_public.write(f"{child.name}Collection {child.name};\n\n")
+                        header_public.write(f"#ifndef NODE_ARRAYS // implement instances as collections\n")
+                        header_public.write(f"{child.name}Collection {child.name};\n")
                         member += ",\n\t\t" + f"{child.name}(this)"
+                        header_public.write(f"#else // implement instances as NodeArray\n")
+                        header_public.write(
+                            f"sdk::NodeArray<{child_namespace}::{child.name}> {child.name};\n"
+                        )
+                        header_public.write(f"#endif // implement instances\n\n")
                     else:
                         child_namespace_list = namespace_list + [child.name]
                         child_namespace = self.__get_namespace(child_namespace_list)
@@ -481,7 +510,9 @@ class VehicleModelConan(ConanFile):
         ) as file:
             file.write(
                 f"{self.file_header}\n\n"
-                + self.ctx_header.get_content().replace("%MEMBER%", member)
+                + self.ctx_header.get_content()
+                .replace("%MEMBER%", member)
+                .replace("%CHILDREN%", children_)
             )
 
         self.ctx_header.reset()

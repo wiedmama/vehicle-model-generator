@@ -12,10 +12,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-pip3 install -r ./requirements-dev.txt
-pip3 install -r ./requirements.txt
-pip3 install -r ./tests/requirements.txt
-pip3 install -e .
+sudo apt update
+sudo apt install -y python3.11 python3.11-venv
+
+
+python3.11 -m venv venv
+./venv/bin/pip3 install -r requirements-dev.txt
+./venv/bin/pip3 install -r requirements.txt
+./venv/bin/pip3 install -r tests/requirements.txt
+./venv/bin/pip3 install -e .
+
+#pip3 install -r ./requirements-dev.txt
+#pip3 install -r ./requirements.txt
+#pip3 install -r ./tests/requirements.txt
+#pip3 install -e .
 
 # add repo to git safe.directory
 REPO=$(pwd)
